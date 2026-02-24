@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Slides 使用指南</title>
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=jetbrains-mono@400,500,700&display=swap">
+    <style>
+        /* ===========================================
+           TERMINAL GREEN THEME
+           Developer-focused hacker aesthetic
+           =========================================== */
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0a0a0a;
+            --terminal-green: #00ff41;
+            --terminal-dim: #00cc33;
+            --terminal-dark: #003300;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #444444;
+            --error-red: #ff3333;
+            --warn-yellow: #ffaa00;
+            --info-blue: #00aaff;
+
+            --font-display: 'Clash Display', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --title-size: clamp(2rem, 6vw, 4rem);
+            --h2-size: clamp(1.5rem, 4vw, 2.5rem);
+            --h3-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            --body-size: clamp(0.8rem, 1.5vw, 1rem);
+            --code-size: clamp(0.7rem, 1.2vw, 0.9rem);
+
+            --slide-padding: clamp(1.5rem, 4vw, 3rem);
+            --content-gap: clamp(1rem, 2vw, 1.5rem);
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.5s;
+        }
+
+        /* ===========================================
+           BASE & VIEWPORT FITTING
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: var(--body-size);
+            line-height: 1.6;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        /* CRT Scanline Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 65, 0.02) 0px,
+                rgba(0, 255, 65, 0.02) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* ===========================================
+           SLIDE CONTAINER
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            padding: var(--slide-padding);
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-primary);
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===========================================
+           TERMINAL UI ELEMENTS
+           =========================================== */
+        .terminal-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0.75rem var(--slide-padding);
+            background: rgba(0, 255, 65, 0.05);
+            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+        }
+
+        .terminal-header .title {
+            color: var(--terminal-green);
+        }
+
+        .terminal-header .dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .terminal-header .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid var(--text-muted);
+        }
+
+        .prompt {
+            color: var(--terminal-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .prompt::before {
+            content: '$ ';
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.2em;
+            background: var(--terminal-green);
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1, h2, h3 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: var(--title-size);
+            color: var(--text-primary);
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            margin-bottom: var(--content-gap);
+        }
+
+        h2 {
+            font-size: var(--h2-size);
+            color: var(--terminal-green);
+            margin-bottom: calc(var(--content-gap) * 0.8);
+            border-left: 3px solid var(--terminal-green);
+            padding-left: 1rem;
+        }
+
+        h3 {
+            font-size: var(--h3-size);
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            max-width: 800px;
+        }
+
+        .highlight {
+            color: var(--terminal-green);
+            background: rgba(0, 255, 65, 0.1);
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+        }
+
+        .dim {
+            color: var(--text-muted);
+        }
+
+        /* ===========================================
+           CODE BLOCKS
+           =========================================== */
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: var(--code-size);
+            overflow-x: auto;
+            margin: 0.75rem 0;
+        }
+
+        .code-block .comment {
+            color: var(--text-muted);
+        }
+
+        .code-block .keyword {
+            color: var(--warn-yellow);
+        }
+
+        .code-block .string {
+            color: var(--terminal-green);
+        }
+
+        .code-block .command {
+            color: var(--info-blue);
+        }
+
+        /* ===========================================
+           LISTS
+           =========================================== */
+        ul, ol {
+            list-style: none;
+            margin: 0.5rem 0;
+        }
+
+        li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--terminal-green);
+        }
+
+        /* ===========================================
+           GRID & CARDS
+           =========================================== */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .card {
+            background: rgba(0, 255, 65, 0.03);
+            border: 1px solid rgba(0, 255, 65, 0.15);
+            border-radius: 4px;
+            padding: 1rem;
+        }
+
+        .card h4 {
+            color: var(--terminal-green);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-family: var(--font-mono);
+        }
+
+        .card p {
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+        .reveal:nth-child(5) { transition-delay: 0.5s; }
+        .reveal:nth-child(6) { transition-delay: 0.6s; }
+
+        /* Typewriter Effect */
+        .typewriter {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 2s steps(40, end);
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        /* ===========================================
+           NAVIGATION
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-dot.active {
+            background: var(--terminal-green);
+            box-shadow: 0 0 10px var(--terminal-green);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--terminal-green);
+            z-index: 100;
+            transition: width 0.3s;
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 1rem;
+            right: var(--slide-padding);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        /* ===========================================
+           SPECIAL SLIDES
+           =========================================== */
+        .title-slide {
+            text-align: center;
+        }
+
+        .title-slide h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+        }
+
+        .title-slide .subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: var(--terminal-dim);
+            margin-top: 1rem;
+        }
+
+        .end-slide {
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border: 1px solid var(--terminal-green);
+            color: var(--terminal-green);
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ===========================================
+           RESPONSIVE
+           =========================================== */
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(1rem, 3vw, 2rem);
+                --content-gap: clamp(0.5rem, 1.5vw, 1rem);
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                transition: opacity 0.3s;
+                transform: none;
+            }
+            .cursor {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <!-- SLIDE 1: Cover -->
+    <section class="slide title-slide">
+        <div class="terminal-header">
+            <span class="title">frontend-slides@latest</span>
+            <div class="dots">
+                <span class="dot" style="border-color: #ff5f56;"></span>
+                <span class="dot" style="border-color: #ffbd2e;"></span>
+                <span class="dot" style="border-color: #27c93f;"></span>
+            </div>
+        </div>
+        <div class="slide-content">
+            <div class="reveal">
+                <span class="badge">DOCUMENTATION v1.0</span>
+            </div>
+            <h1 class="reveal">Frontend Slides<br><span style="color: var(--terminal-green);">使用指南</span></h1>
+            <p class="subtitle reveal">零依赖、动画丰富的 HTML 演示文稿生成工具</p>
+            <div class="reveal" style="margin-top: 2rem;">
+                <span class="prompt">cat guide.md</span><span class="cursor"></span>
+            </div>
+        </div>
+        <div class="slide-number">01/12</div>
+    </section>
+
+    <!-- SLIDE 2: What is Frontend Slides -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="prompt reveal">./what_is_this.sh</div>
+            <h2 class="reveal">什么是 Frontend Slides？</h2>
+            <p class="reveal">一个 Claude Code Skill，帮助非设计师创建漂亮的网页演示文稿。</p>
+
+            <div class="grid reveal">
+                <div class="card">
+                    <h4>[01] 零依赖</h4>
+                    <p>单个 HTML 文件，内联 CSS/JS。无需 npm，无需构建工具，开箱即用。</p>
+                </div>
+                <div class="card">
+                    <h4>[02] 视觉发现</h4>
+                    <p>不知道想要什么风格？生成预览让你选择，而不是抽象的描述。</p>
+                </div>
+                <div class="card">
+                    <h4>[03] PPT 转换</h4>
+                    <p>将现有的 PowerPoint 文件转换为网页版，保留所有内容和图片。</p>
+                </div>
+                <div class="card">
+                    <h4>[04] 独特设计</h4>
+                    <p>避免千篇一律的"AI 审美"，每个演示都感觉是量身定制。</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-number">02/12</div>
+    </section>
+
+    <!-- SLIDE 3: Core Philosophy -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="prompt reveal">cat core_philosophy.md</div>
+            <h2 class="reveal">核心哲学</h2>
+
+            <ul>
+                <li class="reveal">
+                    <strong style="color: var(--text-primary);">零依赖</strong> — 单个 HTML 文件胜过千言万语。10年后仍然可用。
+                </li>
+                <li class="reveal">
+                    <strong style="color: var(--text-primary);">Show, Don't Tell</strong> — 人们不知道自己想要什么，直到他们看到它。
+                </li>
+                <li class="reveal">
+                    <strong style="color: var(--text-primary);">Distinctive Design</strong> — 每个演示都应该感觉定制，而非模板生成。
+                </li>
+                <li class="reveal">
+                    <strong style="color: var(--text-primary);">Production Quality</strong> — 代码应该有良好注释、可访问、高性能。
+                </li>
+                <li class="reveal">
+                    <strong style="color: var(--text-primary);">Viewport Fitting</strong> — 每页幻灯片必须完全适配视口，禁止内部滚动。
+                </li>
+            </ul>
+
+            <div class="code-block reveal" style="margin-top: 1rem;">
+<span class="comment">// 黄金法则</span><br>
+Each slide = exactly one viewport height (100vh/100dvh)<br>
+Content overflows? → Split into multiple slides<br>
+Never scroll within a slide.
+            </div>
+        </div>
+        <div class="slide-number">03/12</div>
+    </section>
+
+    <!-- SLIDE 4: Usage Modes -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="prompt reveal">./modes.sh --list</div>
+            <h2 class="reveal">三种使用模式</h2>
+
+            <div class="grid reveal">
+                <div class="card">
+                    <h4>Mode A: 新建演示</h4>
+                    <p>从零开始创建幻灯片<br><span class="dim">→ 进入内容发现阶段</span></p>
+                </div>
+                <div class="card">
+                    <h4>Mode B: PPT 转换</h4>
+                    <p>转换 .ppt/.pptx 文件<br><span class="dim">→ 进入提取阶段</span></p>
+                </div>
+                <div class="card">
+                    <h4>Mode C: 增强现有</h4>
+                    <p>改进已有的 HTML 演示<br><span class="dim">→ 读取并优化</span></p>
+                </div>
+            </div>
+
+            <div class="code-block reveal">
+<span class="command">/frontend-slides</span><br>
+<span class="string">"创建我的 AI 初创公司 pitch deck"</span><br>
+<span class="string">"将 presentation.pptx 转为网页版"</span>
+            </div>
+        </div>
+        <div class="slide-number">04/12</div>
+    </section>
+
+    <!-- SLIDE 5: Creating New -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="prompt reveal">./create_new.sh --help</div>
+            <h2 class="reveal">创建新演示文稿</h2>
+
+            <h3 class="reveal">Phase 1: 内容发现</h3>
+            <ul>
+                <li class="reveal">用途：Pitch deck / 教学 / 会议演讲 / 内部汇报</li>
+                <li class="reveal">长度：短(5-10页) / 中(10-20页) / 长(20+页)</li>
+                <li class="reveal">内容状态：已有内容 / 粗略笔记 / 只有主题</li>
+            </ul>
+
+            <h3 class="reveal" style="margin-top: 1rem;">Phase 2: 风格发现</h3>
+            <ul>
+                <li class="reveal">感觉：专业可信 / 活泼创新 / 简洁专注 / 情感共鸣</li>
+                <li class="reveal">生成 3 个预览 → 用户选择 → 生成完整演示</li>
+            </ul>
+
+            <div class="code-block reveal">
+<span class="comment"># 工作流程</span><br>
+1. Ask about content → 2. Generate 3 previews → 3. User picks style<br>
+4. Generate full presentation → 5. Open in browser
+            </div>
+        </div>
+        <div class="slide-number">05/12</div>
+    </section>
+
+    <!-- SLIDE 6: Style Presets -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="prompt reveal">ls /styles/</div>
+            <h2 class="reveal">12 种预设风格</h2>
+
+            <div class="grid reveal">
+                <div class="card">
+                    <h4>Bold Signal</h4>
+                    <p>自信、高冲击力<br>适合 Pitch deck</p>
+                </div>
+                <div class="card">
+                    <h4>Electric Studio</h4>
+                    <p>干净、专业<br>适合代理商展示</p>
+                </div>
+                <div class="card">
+                    <h4>Neon Cyber</h4>
+                    <p>未来感、科技感<br>适合科技初创</p>
+                </div>
+                <div class="card">
+                    <h4>Terminal Green</h4>
+                    <p>开发者风格<br>适合技术工具</p>
+                </div>
+                <div class="card">
+                    <h4>Dark Botanical</h4>
+                    <p>优雅、精致<br>适合高端品牌</p>
+                </div>
+                <div class="card">
+                    <h4>Swiss Modern</h4>
+                    <p>极简、精确<br>适合企业数据</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-number">06/12</div>
+    </section>
+
+    <!-- SLIDE 7: PPT Conversion -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="prompt reveal">python3 extract_pptx.py input.pptx</div>
+            <h2 class="reveal">PowerPoint 转换</h2>
+
+            <p class="reveal">使用 python-pptx 库提取所有内容：</p>
+
+            <div class="code-block reveal">
+<span class="keyword">from</span> pptx <span class="keyword">import</span> Presentation<br><br>
+prs = Presentation(file_path)<br>
+<span class="keyword">for</span> slide <span class="keyword">in</span> prs.slides:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 提取标题</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;title = slide.shapes.title.text<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 提取图片</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> shape.shape_type == 13:  <span class="comment"># Picture</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;image = shape.image.blob<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 提取备注</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;notes = slide.notes_slide.notes_text_frame.text
+            </div>
+
+            <ul>
+                <li class="reveal">保留所有文本内容和格式</li>
+                <li class="reveal">提取并保存所有图片到 assets 目录</li>
+                <li class="reveal">保留演讲者备注（作为 HTML 注释）</li>
+            </ul>
+        </div>
+        <div class="slide-number">07/12</div>
+    </section>
+
+    <!-- SLIDE 8: Technical Architecture -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="prompt reveal">cat architecture.txt</div>
+            <h2 class="reveal">技术架构</h2>
+
+            <div class="grid reveal">
+                <div class="card">
+                    <h4>Single File</h4>
+                    <p>所有 CSS、JS 内联<br>无外部依赖</p>
+                </div>
+                <div class="card">
+                    <h4>Scroll Snap</h4>
+                    <p>CSS scroll-snap-type<br>精确控制翻页</p>
+                </div>
+                <div class="card">
+                    <h4>Intersection Observer</h4>
+                    <p>滚动触发动画<br>高效性能</p>
+                </div>
+                <div class="card">
+                    <h4>Clamp() Responsive</h4>
+                    <p>viewport 相对单位<br>完美适配所有屏幕</p>
+                </div>
+            </div>
+
+            <div class="code-block reveal" style="margin-top: 1rem;">
+<span class="comment">/* Viewport Fitting - 关键 CSS */</span><br>
+<span class="keyword">.slide</span> {<br>
+&nbsp;&nbsp;width: 100vw;<br>
+&nbsp;&nbsp;height: 100vh; <span class="comment">/* 精确视口高度 */</span><br>
+&nbsp;&nbsp;height: 100dvh; <span class="comment">/* 移动端适配 */</span><br>
+&nbsp;&nbsp;overflow: hidden; <span class="comment">/* 禁止溢出 */</span><br>
+&nbsp;&nbsp;scroll-snap-align: start;<br>
+}
+            </div>
+        </div>
+        <div class="slide-number">08/12</div>
+    </section>
+
+    <!-- SLIDE 9: Code Example -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="prompt reveal">cat example.html</div>
+            <h2 class="reveal">代码示例</h2>
+
+            <div class="code-block reveal">
+<span class="comment">&lt;!-- 幻灯片结构 --&gt;</span><br>
+<span class="keyword">&lt;section</span> <span class="string">class</span>=<span class="string">"slide"</span><span class="keyword">&gt;</span><br>
+&nbsp;&nbsp;<span class="keyword">&lt;div</span> <span class="string">class</span>=<span class="string">"slide-content"</span><span class="keyword">&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">&lt;h2</span> <span class="string">class</span>=<span class="string">"reveal"</span><span class="keyword">&gt;</span>Slide Title<span class="keyword">&lt;/h2&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">&lt;p</span> <span class="string">class</span>=<span class="string">"reveal"</span><span class="keyword">&gt;</span>Content here...<span class="keyword">&lt;/p&gt;</span><br>
+&nbsp;&nbsp;<span class="keyword">&lt;/div&gt;</span><br>
+<span class="keyword">&lt;/section&gt;</span><br><br>
+<span class="comment">/* 动画 - 滚动触发 */</span><br>
+<span class="keyword">.reveal</span> {<br>
+&nbsp;&nbsp;opacity: 0;<br>
+&nbsp;&nbsp;transform: <span class="command">translateY</span>(30px);<br>
+&nbsp;&nbsp;transition: all 0.6s <span class="command">cubic-bezier</span>(0.16, 1, 0.3, 1);<br>
+}<br>
+<span class="keyword">.slide.visible .reveal</span> {<br>
+&nbsp;&nbsp;opacity: 1;<br>
+&nbsp;&nbsp;transform: <span class="command">translateY</span>(0);<br>
+}
+            </div>
+        </div>
+        <div class="slide-number">09/12</div>
+    </section>
+
+    <!-- SLIDE 10: Best Practices -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="prompt reveal">cat best_practices.md</div>
+            <h2 class="reveal">最佳实践</h2>
+
+            <h3 class="reveal">内容密度限制（每页）</h3>
+            <ul>
+                <li class="reveal">标题页：1 标题 + 1 副标题 + 可选标语</li>
+                <li class="reveal">内容页：1 标题 + 4-6 要点 或 1 标题 + 2 段落</li>
+                <li class="reveal">功能网格：1 标题 + 最多 6 卡片 (2x3 或 3x2)</li>
+                <li class="reveal">代码页：1 标题 + 最多 8-10 行代码</li>
+            </ul>
+
+            <h3 class="reveal" style="margin-top: 0.75rem;">样式规范</h3>
+            <ul>
+                <li class="reveal">字体大小使用 <code class="highlight">clamp()</code> 函数</li>
+                <li class="reveal">间距使用 viewport 相对单位</li>
+                <li class="reveal">图片最大高度 <code class="highlight">min(50vh, 400px)</code></li>
+                <li class="reveal">内容超出 → 拆分成多页，绝不允许滚动</li>
+            </ul>
+        </div>
+        <div class="slide-number">10/12</div>
+    </section>
+
+    <!-- SLIDE 11: Troubleshooting -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="prompt reveal">./troubleshoot.sh</div>
+            <h2 class="reveal">故障排除</h2>
+
+            <div class="grid reveal">
+                <div class="card">
+                    <h4 style="color: var(--error-red);">[ERR] 字体未加载</h4>
+                    <p>检查 Fontshare/Google Fonts URL<br>确保 CSS 中的字体名称匹配</p>
+                </div>
+                <div class="card">
+                    <h4 style="color: var(--error-red);">[ERR] 动画不触发</h4>
+                    <p>验证 Intersection Observer 是否运行<br>检查 .visible 类是否正确添加</p>
+                </div>
+                <div class="card">
+                    <h4 style="color: var(--warn-yellow);">[WARN] 滚动吸附失效</h4>
+                    <p>确保 html/body 上有 scroll-snap-type<br>每页 slide 需要 scroll-snap-align: start</p>
+                </div>
+                <div class="card">
+                    <h4 style="color: var(--warn-yellow);">[WARN] 移动端问题</h4>
+                    <p>在 768px 断点禁用复杂效果<br>测试触摸事件，减少粒子数量</p>
+                </div>
+            </div>
+
+            <div class="code-block reveal" style="margin-top: 0.5rem;">
+<span class="comment">/* 性能优化 */</span><br>
+<span class="keyword">@media</span> (prefers-reduced-motion: reduce) {<br>
+&nbsp;&nbsp;<span class="keyword">*</span> { animation-duration: 0.01ms !important; }<br>
+}
+            </div>
+        </div>
+        <div class="slide-number">11/12</div>
+    </section>
+
+    <!-- SLIDE 12: End -->
+    <section class="slide end-slide">
+        <div class="slide-content">
+            <div class="reveal">
+                <span class="badge">EOF</span>
+            </div>
+            <h1 class="reveal">开始使用<br><span style="color: var(--terminal-green);">/frontend-slides</span></h1>
+
+            <div class="reveal" style="margin: 1.5rem 0;">
+                <p style="color: var(--text-secondary);">创建零依赖、动画丰富的 HTML 演示文稿</p>
+            </div>
+
+            <div class="code-block reveal" style="text-align: left; max-width: 500px; margin: 0 auto;">
+<span class="comment"># 快速开始</span><br>
+<span class="command">/frontend-slides</span><br>
+<span class="string">"创建我的 pitch deck"</span><br><br>
+<span class="comment"># 转换 PPT</span><br>
+<span class="string">"将 slides.pptx 转为网页版"</span>
+            </div>
+
+            <div class="reveal" style="margin-top: 2rem;">
+                <p class="dim">github.com/zarazhangrui/frontend-slides</p>
+            </div>
+        </div>
+        <div class="slide-number">12/12</div>
+    </section>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+
+                this.initNavigation();
+                this.initKeyboard();
+                this.initTouch();
+                this.initIntersectionObserver();
+                this.updateProgress();
+            }
+
+            initNavigation() {
+                const navDots = document.getElementById('navDots');
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot' + (index === 0 ? ' active' : '');
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    navDots.appendChild(dot);
+                });
+                this.navDots = document.querySelectorAll('.nav-dot');
+            }
+
+            initKeyboard() {
+                document.addEventListener('keydown', (e) => {
+                    switch(e.key) {
+                        case 'ArrowDown':
+                        case 'ArrowRight':
+                        case ' ':
+                        case 'PageDown':
+                            e.preventDefault();
+                            this.nextSlide();
+                            break;
+                        case 'ArrowUp':
+                        case 'ArrowLeft':
+                        case 'PageUp':
+                            e.preventDefault();
+                            this.prevSlide();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.goToSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.goToSlide(this.totalSlides - 1);
+                            break;
+                    }
+                });
+            }
+
+            initTouch() {
+                let startY = 0;
+                let startX = 0;
+
+                document.addEventListener('touchstart', (e) => {
+                    startY = e.touches[0].clientY;
+                    startX = e.touches[0].clientX;
+                }, { passive: true });
+
+                document.addEventListener('touchend', (e) => {
+                    const endY = e.changedTouches[0].clientY;
+                    const endX = e.changedTouches[0].clientX;
+                    const diffY = startY - endY;
+                    const diffX = startX - endX;
+
+                    if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 50) {
+                        if (diffY > 0) {
+                            this.nextSlide();
+                        } else {
+                            this.prevSlide();
+                        }
+                    }
+                }, { passive: true });
+            }
+
+            initIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            const index = Array.from(this.slides).indexOf(entry.target);
+                            this.updateActiveDot(index);
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            goToSlide(index) {
+                if (index >= 0 && index < this.totalSlides) {
+                    this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) {
+                    this.goToSlide(this.currentSlide + 1);
+                }
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) {
+                    this.goToSlide(this.currentSlide - 1);
+                }
+            }
+
+            updateActiveDot(index) {
+                this.currentSlide = index;
+                this.navDots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+                this.updateProgress();
+            }
+
+            updateProgress() {
+                const progress = ((this.currentSlide + 1) / this.totalSlides) * 100;
+                document.getElementById('progress').style.width = progress + '%';
+            }
+        }
+
+        // Initialize
+        new SlidePresentation();
+
+        // Mouse wheel support
+        let wheelTimeout;
+        document.addEventListener('wheel', (e) => {
+            clearTimeout(wheelTimeout);
+            wheelTimeout = setTimeout(() => {
+                if (e.deltaY > 0) {
+                    document.querySelector('.slide:last-child').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    document.querySelector('.slide:first-child').scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 50);
+        }, { passive: true });
+    </script>
+</body>
+</html>
